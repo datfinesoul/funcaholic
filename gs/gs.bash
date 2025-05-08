@@ -26,6 +26,12 @@ gs() {
 		has_jq=1
 	fi
 
+	# Check OS type for find command compatibility
+	local is_mac=0
+	if [[ "$(uname)" == "Darwin" ]]; then
+		is_mac=1
+	fi
+
 	# Commands are shadowed by closer directories (like PATH resolution)
 	declare -A seen_commands
 
@@ -58,7 +64,18 @@ gs() {
 			# Store path for ordering
 			dir_order+=("${display_path}")
 
+			# Find executable symlinks with OS-specific syntax
+			local find_cmd
+			if [[ ${is_mac} -eq 1 ]]; then
+				# macOS/BSD find syntax
+				find_cmd="find \"${gs_path}/\" -type l -perm +111 -exec basename {} \;"
+			else
+				# GNU/Linux find syntax
+				find_cmd="find \"${gs_path}/\" -type l ! -xtype l -perm -111 -exec basename {} \;"
+			fi
+
 			# Find executable symlinks and filter out already-seen commands
+			# This mimics PATH resolution where first match wins
 			local cmd_list=""
 			while IFS= read -r cmd; do
 				[[ -z "${cmd}" ]] && continue
@@ -80,7 +97,7 @@ gs() {
 
 					cmd_list+="${cmd}"$'\n'
 				fi
-			done < <(find "${gs_path}/" -type l ! -xtype l -perm -111 -exec basename {} \; | sort)
+			done < <(eval "${find_cmd}" | sort)
 
 			# Remove trailing newline
 			cmd_list="${cmd_list%$'\n'}"
@@ -104,7 +121,8 @@ gs() {
 			fi
 		done
 
-		# Output directories closest-first with their unique commands
+		# Output: directories are shown closest-first with their unique commands
+		# When a command appears in multiple _gs dirs, only the closest occurrence is shown
 		for dir in "${dir_order[@]}"; do
 			# Skip directories with no commands to display
 			[[ -z "${gs_dir_commands["${dir}"]}" ]] && continue
