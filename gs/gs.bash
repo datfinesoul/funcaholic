@@ -10,7 +10,15 @@ gs() {
 	# Parse current repo-relative path into array
 	# Example: if current path is project/src/utils, then dirs=["project","src","utils"]
 	local -a dirs
-	IFS=/ read -r -a dirs <<< "$(git rev-parse --show-prefix)"
+
+	# OSX BSD fix
+	local prefix
+	prefix="$(git rev-parse --show-prefix)"
+	prefix=${prefix%/}
+	IFS='/'
+	dirs=($prefix)
+	unset IFS
+	#IFS=/ read -r -a dirs <<< "$(git rev-parse --show-prefix)"
 
 	local gs_path index
 	local command="${1:-}"
