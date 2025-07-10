@@ -1,3 +1,7 @@
+gs() {
+	# Exit if git isn't available
+	if ! type git &> /dev/null; then return 1; fi
+
 	# Get the top level git directory absolute path or exit if not a git repo
 	local tld
 	tld="$(git rev-parse --show-toplevel 2> /dev/null)" || return 1
