@@ -7,18 +7,27 @@ gs() {
 	tld="$(git rev-parse --show-toplevel 2> /dev/null)" || return 1
 	[[ -z "${tld}" ]] && return 1
 
-	# Parse current repo-relative path into array
-	# Example: if current path is project/src/utils, then dirs=["project","src","utils"]
-	local -a dirs
-	IFS=/ read -r -a dirs <<< "$(git rev-parse --show-prefix)"
+	# Parse current repo-relative path into array (zsh compatible)
+	local dirs
+	IFS=/
+	dirs=($(git rev-parse --show-prefix))
 
 	local gs_path index
 	local command="${1:-}"
 	local length="${#dirs[@]}"
 	local found_dirs=0
-	declare -A gs_dir_commands
-	declare -A cmd_descriptions
-	local -a dir_order
+
+	# Use associative arrays in zsh and bash
+	if [[ -n ${ZSH_VERSION-} ]]; then
+		typeset -A gs_dir_commands
+		typeset -A cmd_descriptions
+		typeset -A seen_commands
+	else
+		declare -A gs_dir_commands
+		declare -A cmd_descriptions
+		declare -A seen_commands
+	fi
+	local dir_order=()
 
 	# Check for jq availability
 	local has_jq=0
@@ -31,9 +40,6 @@ gs() {
 	if [[ "$(uname)" == "Darwin" ]]; then
 		is_mac=1
 	fi
-
-	# Commands are shadowed by closer directories (like PATH resolution)
-	declare -A seen_commands
 
 	# Traversal proceeds from current directory up to repo root
 	# For project/src/utils, checks _gs dirs in this order:
@@ -79,7 +85,7 @@ gs() {
 			local cmd_list=""
 			while IFS= read -r cmd; do
 				[[ -z "${cmd}" ]] && continue
-				if [[ -z "${seen_commands["${cmd}"]}" ]]; then
+				if [[ -z "${seen_commands[${cmd}]}" ]]; then
 					seen_commands["${cmd}"]=1
 
 					# Check for description file (same name with .gs.json suffix)
@@ -115,11 +121,19 @@ gs() {
 	else
 		# Determine padding length for aligned output
 		local max_len=0
-		for cmd in "${!cmd_descriptions[@]}"; do
-			if [[ ${#cmd} -gt ${max_len} ]]; then
-				max_len=${#cmd}
-			fi
-		done
+		if [[ -n ${ZSH_VERSION-} ]]; then
+			for cmd in ${(k)cmd_descriptions}; do
+				if [[ ${#cmd} -gt ${max_len} ]]; then
+					max_len=${#cmd}
+				fi
+			done
+		else
+			for cmd in "${!cmd_descriptions[@]}"; do
+				if [[ ${#cmd} -gt ${max_len} ]]; then
+					max_len=${#cmd}
+				fi
+			done
+		fi
 
 		# Output: directories are shown closest-first with their unique commands
 		# When a command appears in multiple _gs dirs, only the closest occurrence is shown
