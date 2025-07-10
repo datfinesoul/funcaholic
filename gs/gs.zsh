@@ -16,17 +16,16 @@ gs() {
 	prefix="$(git rev-parse --show-prefix)"
 	prefix=${prefix%/}
 	IFS='/'
-	dirs=($prefix)
+	dirs=("${(s:/:)prefix}")
 	unset IFS
-	#IFS=/ read -r -a dirs <<< "$(git rev-parse --show-prefix)"
 
 	local gs_path index
 	local command="${1:-}"
 	local length="${#dirs[@]}"
 	local found_dirs=0
-	declare -A gs_dir_commands
-	declare -A cmd_descriptions
-	declare -A seen_commands
+	local -A gs_dir_commands
+	local -A cmd_descriptions
+	local -A seen_commands
 	local -a dir_order
 
 	# Check for jq availability
@@ -50,7 +49,7 @@ gs() {
 	#  4. _gs (repo root)
 	for (( index="${length}"; index>=0; index-- )); do
 		gs_path="${tld}$(printf "/%s" "${dirs[@]:0:$index}")/_gs"
-		gs_path="${gs_path//\/\//\/}"  # Normalize path
+		gs_path="${gs_path:gs,//,/}" # Normalize path
 
 		if [[ -e "${gs_path}" ]]; then
 			# Execute command if it exists
@@ -61,7 +60,7 @@ gs() {
 			fi
 
 			# Convert absolute paths to repo-relative for display
-			local display_path
+			local display_path=""
 			if [[ "${gs_path}" == "${tld}/_gs" ]]; then
 				display_path="_gs/"
 			else
@@ -72,7 +71,7 @@ gs() {
 			dir_order+=("${display_path}")
 
 			# Find executable symlinks with OS-specific syntax
-			local find_cmd
+			local find_cmd=""
 			if [[ ${is_mac} -eq 1 ]]; then
 				# macOS/BSD find syntax
 				find_cmd="find \"${gs_path}/\" -type l -perm +111 -exec basename {} \;"
@@ -122,7 +121,7 @@ gs() {
 	else
 		# Determine padding length for aligned output
 		local max_len=0
-		for cmd in "${!cmd_descriptions[@]}"; do
+		for cmd in "${(k)cmd_descriptions[@]}"; do
 			if [[ ${#cmd} -gt ${max_len} ]]; then
 				max_len=${#cmd}
 			fi
