@@ -3,7 +3,6 @@ _gs_completion() {
     local commands
     commands=($(gs 2>/dev/null | grep "^→" | sed 's/^→ \([^ ]*\).*/\1/'))
     
-    # Offer these commands as completions
     compadd "$@" "${commands[@]}"
 }
 
