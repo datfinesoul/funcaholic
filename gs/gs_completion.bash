@@ -1,4 +1,3 @@
-# Simple bash completion for gs() function
 _gs_completion() {
     # Get available commands by calling gs() and parsing output
     local commands
