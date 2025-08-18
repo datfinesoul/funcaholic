@@ -47,7 +47,7 @@ gs() {
 	#  2. project/src/_gs
 	#  3. project/_gs
 	#  4. _gs (repo root)
-	for (( index="${length}"; index>=0; index-- )); do
+	for (( index=length; index>=0; index-- )); do
 		gs_path="${tld}$(printf "/%s" "${dirs[@]:0:$index}")/_gs"
 		gs_path="${gs_path:gs,//,/}" # Normalize path
 
