@@ -6,6 +6,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This repository contains the `gs` shell function - a Git repository-aware command runner that uses symbolic links in `_gs` directories to organize and execute project-specific commands. The function searches from the current directory up to the repository root, finding and executing commands while providing shell completion.
 
+## Why a Shell Function (Not an Executable)
+
+`gs` is implemented as a shell function rather than a standalone executable for a fundamental reason: **environment modification capability**. Shell functions can directly modify the current shell environment (change directories, set variables, modify PATH, etc.), while executables run in isolated subprocesses where any environment changes are lost when the process exits. This capability is essential for development tools that need to affect the user's active shell session.
+
 ## Architecture
 
 The project consists of 4 main shell scripts:
@@ -23,9 +27,15 @@ The `gs` function implements a "shadowing" system similar to PATH resolution:
 
 1. **Directory Traversal**: Searches for `_gs` directories from current directory up to git repository root
 2. **Command Resolution**: First occurrence of a command name takes precedence (closer directories override distant ones)
-3. **Execution**: Executes symbolic links as commands, passing through arguments
+3. **Execution**: Executes symbolic links as commands OR sources them if they end in `.mod`
 4. **Listing**: When no command specified, lists all available commands grouped by directory
 5. **Descriptions**: Supports `.gs.json` files alongside commands to provide descriptions
+
+## Command Execution Types
+
+- **Regular symlinks**: Executed in subprocess (`"${target}" "$@"`)
+- **`.mod` symlinks**: Sourced into current shell (`source "${target}" "$@"`) 
+- Detection uses regex pattern: `[[ "${command}" =~ \.mod$ ]]`
 
 ## Key Implementation Details
 
@@ -33,6 +43,7 @@ The `gs` function implements a "shadowing" system similar to PATH resolution:
 - **Cross-Platform**: Handles macOS/BSD vs GNU/Linux differences in `find` command syntax
 - **JSON Support**: Optional `jq` integration for command descriptions
 - **Shell Completion**: Dynamic completion based on available commands in `_gs` directories
+- **File Discovery**: Finds both executable symlinks (permission-based) and `.mod` files (name-based)
 
 ## Development Workflow
 

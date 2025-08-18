@@ -1,6 +1,30 @@
 # `gs` Function Guide
 
-The `gs` function is a powerful utility for managing and executing symbolic link-based commands stored in `_gs` directories within a Git repository. This guide explains how to use it effectively.
+The `gs` function is a powerful shell function for managing and executing symbolic link-based commands stored in `_gs` directories within a Git repository. This guide explains how to use it effectively.
+
+## Why a Shell Function Instead of an Executable?
+
+`gs` is implemented as a shell function rather than a standalone executable for a critical reason: **environment modification capability**. 
+
+Unlike executables that run in isolated subprocesses, shell functions can directly modify your current shell environment. This means `gs` commands can:
+
+- Change your current working directory (`cd`)
+- Set or modify environment variables 
+- Update your shell's PATH
+- Modify any aspect of your active shell session
+
+An executable cannot affect the parent shell's environment - any changes die when the subprocess exits. This makes shell functions ideal for development tools that need to interact with and modify your working environment.
+
+---
+
+## Command Types
+
+`gs` supports two types of commands:
+
+- **Executable commands**: Regular symlinks that are executed in a subprocess
+- **Sourced commands**: Symlinks ending in `.mod` that are sourced into the current shell
+
+Sourced commands can modify your shell environment (set variables, change directories, etc.) while executable commands run in isolation.
 
 ---
 
@@ -39,7 +63,8 @@ You can add descriptions to commands by creating a JSON file with the same name 
 ```
 _gs/
 ├── build -> ../scripts/build.sh
-└── build.gs.json
+├── build.gs.json
+└── env.mod -> ../scripts/dev-env.sh
 ```
 
 Where `build.gs.json` contains:
@@ -114,6 +139,16 @@ gs build --target production
 
 This runs the symbolic link named `build` with the argument `--target production`.
 
+#### Example 3: Source a Command
+
+To source a `.mod` command that sets up your development environment:
+
+```bash
+gs env.mod
+```
+
+This sources the `env.mod` symlink, allowing it to modify your current shell environment (set variables, change directories, etc.).
+
 ---
 
 ## Best Practices
@@ -128,6 +163,7 @@ This runs the symbolic link named `build` with the argument `--target production
 
 3. **Symbolic Links Only**:
    - Ensure that `_gs` directories contain only symbolic links pointing to the actual scripts or executables.
+   - Use `.mod` suffix for symlinks that should be sourced rather than executed.
 
 4. **Naming Conflicts**:
    - Use unique names for symbolic links to prevent unintended command executions.
