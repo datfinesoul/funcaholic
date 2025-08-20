@@ -44,7 +44,7 @@ run_test() {
     if actual_output=$(eval "${command}" 2>&1); then
         # Normalize paths in output (replace absolute paths with relative)
         actual_output=$(echo "${actual_output}" | sed "s|${EXAMPLE_DIR}/||g" | sed "s|${SCRIPT_DIR}/||g")
-        
+
         # For env commands, filter out environment-specific variables
         if [[ "${command}" == *"gs env"* ]]; then
             actual_output=$(echo "${actual_output}" | grep -E '^(git_|NODE_ENV)')
@@ -100,10 +100,10 @@ run_test "execute_env_from_root" "${EXAMPLE_DIR}" "gs env"
 run_test "execute_env_from_js" "${EXAMPLE_DIR}/js/project-b" "gs env"
 
 # Test 6: Test lint command from js directory (command resolution only)
-run_test "resolve_lint_from_js" "${EXAMPLE_DIR}/js/project-b" "gs lint --help 2>&1 | head -1 || echo 'Command resolved to js lint script'"
+run_test "resolve_lint_from_js" "${EXAMPLE_DIR}/js/project-b" "gs lint 2> /dev/null"
 
-# Test 7: Test lint command from python directory (command resolution only)  
-run_test "resolve_lint_from_python" "${EXAMPLE_DIR}/python/project-a" "gs lint --help 2>&1 | head -1 || echo 'Command resolved to python lint script'"
+# Test 7: Test lint command from python directory (command resolution only)
+run_test "resolve_lint_from_python" "${EXAMPLE_DIR}/python/project-a" "gs lint 2> /dev/null"
 
 # Summary
 echo

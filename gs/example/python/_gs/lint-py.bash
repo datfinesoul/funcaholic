@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 docker run --rm \
-	--user $(id -u):$(id -g) \
-	-v "$(pwd)":/app \
+	-v "$(pwd)":/app:ro \
 	-w /app \
+	--entrypoint '' \
 	python:3-slim \
 	sh -c "pip install ruff && ruff check --fix ."

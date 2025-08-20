@@ -1,2 +1,7 @@
-WARNING: The directory '/.cache/pip' or its parent directory is not owned or is not writable by the current user. The cache has been disabled. Check the permissions and owner of that directory. If executing pip with sudo, you should use sudo's -H flag.
-Command resolved to python lint script
+Collecting ruff
+  Downloading ruff-0.12.9-py3-none-manylinux_2_17_aarch64.manylinux2014_aarch64.whl.metadata (25 kB)
+Downloading ruff-0.12.9-py3-none-manylinux_2_17_aarch64.manylinux2014_aarch64.whl (11.9 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 11.9/11.9 MB 97.7 MB/s  0:00:00
+Installing collected packages: ruff
+Successfully installed ruff-0.12.9
+All checks passed!

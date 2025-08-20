@@ -103,7 +103,7 @@ gs() {
 
 					cmd_list+="${cmd}"$'\n'
 				fi
-			done < <(eval "${find_cmd}" | sort)
+			done < <(eval "${find_cmd}" | sort -f)
 
 			# Remove trailing newline
 			cmd_list="${cmd_list%$'\n'}"
