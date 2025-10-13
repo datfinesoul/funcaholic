@@ -41,7 +41,6 @@ run_test() {
     # Change to test directory and capture output
     cd "${test_dir}"
     local actual_output
-		echo "COMMAND $command"
     if actual_output=$(eval "${command}" 2>&1); then
         # Normalize paths in output (replace absolute paths with relative)
         actual_output=$(echo "${actual_output}" | sed "s|${EXAMPLE_DIR}/||g" | sed "s|${SCRIPT_DIR}/||g")

@@ -46,3 +46,31 @@ When running `gs` commands, closer `_gs` directories take precedence:
 - **`lint`** in `python/_gs/`: Runs Python linting
 
 Same command name, different implementations based on directory context.
+
+## Docker-based Linting Examples
+
+For real-world usage, the lint commands can use Docker to run language-specific tools without requiring local installation:
+
+### JavaScript (Standard.js)
+```bash
+#!/usr/bin/env bash
+docker run --rm \
+  -v "$(pwd)":/app:ro \
+  -w /app \
+  --entrypoint '' \
+  node:lts-alpine \
+  sh -c "npx --yes standard --fix"
+```
+
+### Python (Ruff)
+```bash
+#!/usr/bin/env bash
+docker run --rm \
+  -v "$(pwd)":/app:ro \
+  -w /app \
+  --entrypoint '' \
+  python:3-slim \
+  sh -c "pip install -q ruff && ruff check --fix ."
+```
+
+This approach provides consistent linting environments across teams without requiring developers to install specific versions of Node.js, Python, or linting tools locally.

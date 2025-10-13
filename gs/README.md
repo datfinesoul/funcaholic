@@ -2,6 +2,24 @@
 
 If you work across multiple projects with different linting, testing, or build commands, and need those tools to adapt based on where you are in your repository, `gs` is for you. It organizes context-specific commands in `_gs` directories that shadow each other automatically, and unlike regular scripts, it can modify your shell environment directly.
 
+## Installation
+
+Add to your shell configuration file (`~/.bashrc` or `~/.zshrc`):
+
+```bash
+# For Bash
+source /path/to/funcaholic/gs/gs.bash
+source /path/to/funcaholic/gs/gs_completion.bash
+
+# For Zsh
+source /path/to/funcaholic/gs/gs.zsh
+source /path/to/funcaholic/gs/gs_completion.zsh
+```
+
+Reload your shell or run `source ~/.bashrc` (or `~/.zshrc`).
+
+---
+
 ## Command Types
 
 `gs` supports two types of commands based on symlink naming:
