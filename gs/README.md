@@ -6,17 +6,13 @@ If you work across multiple projects with different linting, testing, or build c
 
 `gs` supports two types of commands based on symlink naming:
 
-### Regular Commands (Execute)
-- **Pattern**: Any symlink without `.mod` suffix (e.g., `lint`, `build`, `test`)
-- **Behavior**: Executes in a subprocess
-- **Use case**: Running scripts that display output but don't need to modify your shell
+| Command Type | Pattern | Behavior | Use Case |
+|--------------|---------|----------|----------|
+| **Execute** | `lint`, `build`, `test` | Runs in subprocess | Display output without affecting shell |
+| **Source** | `env.mod`, `setup.mod` | Runs in current shell | Set variables, change directories, modify PATH |
 
-### Sourced Commands (Modify Environment)
-- **Pattern**: Symlinks ending in `.mod` (e.g., `env.mod`, `setup.mod`)
-- **Behavior**: Sources into your current shell
-- **Use case**: Setting environment variables, changing directories, modifying PATH
-
-**Why this matters**: Regular executables run in isolation—any environment changes disappear when they exit. Only sourced commands (`.mod`) can modify your active shell session.
+> [!IMPORTANT]
+> Regular executables run in isolation. Any environment changes disappear when they exit. Only sourced commands (`.mod`) can modify your active shell session.
 
 ---
 
@@ -71,7 +67,8 @@ This description will appear in the command listing output.
 
 ### Examples
 
-#### Example 1: List Available Commands
+<details>
+<summary>Example 1: List Available Commands</summary>
 
 Assume the following directory structure:
 
@@ -93,11 +90,6 @@ Starting in `repo/src/utils/`:
 
 ```bash
 cd repo/src/utils
-```
-
-Running `gs`:
-
-```bash
 gs
 ```
 
@@ -113,25 +105,26 @@ _gs/
 → deploy
 ```
 
-The output now groups commands by their source directory, with the closest directories shown first. Commands with descriptions display them after the command name.
+The output groups commands by their source directory, with the closest directories shown first. Commands with descriptions display them after the command name.
 
-#### Example 2: Execute a Command
+</details>
+
+<details>
+<summary>Example 2: Execute a Command</summary>
 
 Starting in `repo/src/`:
 
 ```bash
 cd repo/src
-```
-
-To execute the `build` command from the nearest `_gs` directory:
-
-```bash
 gs build --target production
 ```
 
 This runs the symbolic link named `build` with the argument `--target production`.
 
-#### Example 3: Source a Command
+</details>
+
+<details>
+<summary>Example 3: Source a Command</summary>
 
 To source a `.mod` command that sets up your development environment:
 
@@ -141,7 +134,10 @@ gs env.mod
 
 This sources the `env.mod` symlink into your current shell. The script can now set variables, change directories, or modify your environment directly.
 
-**Compare**: Running `gs env` (without `.mod`) would execute in a subprocess—you'd see output but environment changes wouldn't affect your shell.
+> [!TIP]
+> Running `gs env` (without `.mod`) would execute in a subprocess. You'd see output but environment changes wouldn't affect your shell.
+
+</details>
 
 ---
 
