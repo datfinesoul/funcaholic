@@ -1,30 +1,22 @@
 # `gs` Function Guide
 
-The `gs` function is a powerful shell function for managing and executing symbolic link-based commands stored in `_gs` directories within a Git repository. This guide explains how to use it effectively.
-
-## Why a Shell Function Instead of an Executable?
-
-`gs` is implemented as a shell function rather than a standalone executable for a critical reason: **environment modification capability**. 
-
-Unlike executables that run in isolated subprocesses, shell functions can directly modify your current shell environment. This means `gs` commands can:
-
-- Change your current working directory (`cd`)
-- Set or modify environment variables 
-- Update your shell's PATH
-- Modify any aspect of your active shell session
-
-An executable cannot affect the parent shell's environment - any changes die when the subprocess exits. This makes shell functions ideal for development tools that need to interact with and modify your working environment.
-
----
+If you work across multiple projects with different linting, testing, or build commands, and need those tools to adapt based on where you are in your repository, `gs` is for you. It organizes context-specific commands in `_gs` directories that shadow each other automatically, and unlike regular scripts, it can modify your shell environment directly.
 
 ## Command Types
 
-`gs` supports two types of commands:
+`gs` supports two types of commands based on symlink naming:
 
-- **Executable commands**: Regular symlinks that are executed in a subprocess
-- **Sourced commands**: Symlinks ending in `.mod` that are sourced into the current shell
+### Regular Commands (Execute)
+- **Pattern**: Any symlink without `.mod` suffix (e.g., `lint`, `build`, `test`)
+- **Behavior**: Executes in a subprocess
+- **Use case**: Running scripts that display output but don't need to modify your shell
 
-Sourced commands can modify your shell environment (set variables, change directories, etc.) while executable commands run in isolation.
+### Sourced Commands (Modify Environment)
+- **Pattern**: Symlinks ending in `.mod` (e.g., `env.mod`, `setup.mod`)
+- **Behavior**: Sources into your current shell
+- **Use case**: Setting environment variables, changing directories, modifying PATH
+
+**Why this matters**: Regular executables run in isolation—any environment changes disappear when they exit. Only sourced commands (`.mod`) can modify your active shell session.
 
 ---
 
@@ -147,7 +139,9 @@ To source a `.mod` command that sets up your development environment:
 gs env.mod
 ```
 
-This sources the `env.mod` symlink, allowing it to modify your current shell environment (set variables, change directories, etc.).
+This sources the `env.mod` symlink into your current shell. The script can now set variables, change directories, or modify your environment directly.
+
+**Compare**: Running `gs env` (without `.mod`) would execute in a subprocess—you'd see output but environment changes wouldn't affect your shell.
 
 ---
 
