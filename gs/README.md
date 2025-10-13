@@ -1,6 +1,36 @@
 # `gs` Function Guide
 
-The `gs` function is a powerful utility for managing and executing symbolic link-based commands stored in `_gs` directories within a Git repository. This guide explains how to use it effectively.
+If you work across multiple projects with different linting, testing, or build commands, and need those tools to adapt based on where you are in your repository, `gs` is for you. It organizes context-specific commands in `_gs` directories that shadow each other automatically, and unlike regular scripts, it can modify your shell environment directly.
+
+## Installation
+
+Add to your shell configuration file (`~/.bashrc` or `~/.zshrc`):
+
+```bash
+# For Bash
+source /path/to/funcaholic/gs/gs.bash
+source /path/to/funcaholic/gs/gs_completion.bash
+
+# For Zsh
+source /path/to/funcaholic/gs/gs.zsh
+source /path/to/funcaholic/gs/gs_completion.zsh
+```
+
+Reload your shell or run `source ~/.bashrc` (or `~/.zshrc`).
+
+---
+
+## Command Types
+
+`gs` supports two types of commands based on symlink naming:
+
+| Command Type | Pattern | Behavior | Use Case |
+|--------------|---------|----------|----------|
+| **Execute** | `lint`, `build`, `test` | Runs in subprocess | Display output without affecting shell |
+| **Source** | `env.mod`, `setup.mod` | Runs in current shell | Set variables, change directories, modify PATH |
+
+> [!IMPORTANT]
+> Regular executables run in isolation. Any environment changes disappear when they exit. Only sourced commands (`.mod`) can modify your active shell session.
 
 ---
 
@@ -39,7 +69,8 @@ You can add descriptions to commands by creating a JSON file with the same name 
 ```
 _gs/
 ├── build -> ../scripts/build.sh
-└── build.gs.json
+├── build.gs.json
+└── env.mod -> ../scripts/dev-env.sh
 ```
 
 Where `build.gs.json` contains:
@@ -54,7 +85,8 @@ This description will appear in the command listing output.
 
 ### Examples
 
-#### Example 1: List Available Commands
+<details>
+<summary>Example 1: List Available Commands</summary>
 
 Assume the following directory structure:
 
@@ -76,11 +108,6 @@ Starting in `repo/src/utils/`:
 
 ```bash
 cd repo/src/utils
-```
-
-Running `gs`:
-
-```bash
 gs
 ```
 
@@ -96,23 +123,43 @@ _gs/
 → deploy
 ```
 
-The output now groups commands by their source directory, with the closest directories shown first. Commands with descriptions display them after the command name.
+The output groups commands by their source directory, with the closest directories shown first. Commands with descriptions display them after the command name.
 
-#### Example 2: Execute a Command
+</details>
+
+<details>
+<summary>Example 2: Execute a Command</summary>
 
 Starting in `repo/src/`:
 
 ```bash
 cd repo/src
-```
-
-To execute the `build` command from the nearest `_gs` directory:
-
-```bash
 gs build --target production
 ```
 
 This runs the symbolic link named `build` with the argument `--target production`.
+
+</details>
+
+<details>
+<summary>Example 3: Source a Command</summary>
+
+To source a `.mod` command that sets up your development environment:
+
+```bash
+gs env.mod
+```
+
+This sources the `env.mod` symlink into your current shell. If the script contains:
+
+```bash
+export PROJECT_ROOT=$(git rev-parse --show-toplevel)
+export PATH="$PROJECT_ROOT/bin:$PATH"
+```
+
+These variables are now set in your current shell. Running `gs env` (without `.mod`) would execute in a subprocess and you'd see output but environment changes wouldn't affect your shell.
+
+</details>
 
 ---
 
@@ -128,6 +175,7 @@ This runs the symbolic link named `build` with the argument `--target production
 
 3. **Symbolic Links Only**:
    - Ensure that `_gs` directories contain only symbolic links pointing to the actual scripts or executables.
+   - Use `.mod` suffix for symlinks that should be sourced rather than executed.
 
 4. **Naming Conflicts**:
    - Use unique names for symbolic links to prevent unintended command executions.
@@ -135,18 +183,6 @@ This runs the symbolic link named `build` with the argument `--target production
    
 5. **Test Commands**:
    - Regularly verify the behavior of commands to ensure they function correctly in their intended context.
-
----
-
-## Command Resolution
-
-The `gs` function follows a "shadowing" approach similar to how `PATH` resolution works:
-
-1. The function searches `_gs` directories from the current directory up to the repository root.
-2. The first occurrence of a command with a given name takes precedence.
-3. Commands in closer directories override those with the same name in more distant directories.
-
-This allows you to create local overrides of global commands when needed.
 
 ---
 
@@ -163,9 +199,3 @@ This allows you to create local overrides of global commands when needed.
 3. **Missing Descriptions**:
    - Ensure your `.gs.json` files are valid JSON with a `description` field.
    - Check that you have `jq` installed for JSON parsing.
-
----
-
-## Conclusion
-
-The `gs` function simplifies repository-specific task management by leveraging `_gs` directories and symbolic links. By following the guidelines above, you can create a flexible and efficient workflow tailored to your project's structure.

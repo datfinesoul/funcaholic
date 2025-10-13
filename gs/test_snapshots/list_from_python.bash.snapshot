@@ -1,0 +1,5 @@
+gs/example/python/_gs
+→ lint
+gs/example/_gs
+→ env     : Display repo environment variables
+→ env.mod : Source repo environment variables into current shell

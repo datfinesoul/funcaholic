@@ -1,0 +1,3 @@
+git_pwd=gs/example/js/project-b/
+git_rel=../../../../
+NODE_ENV=development

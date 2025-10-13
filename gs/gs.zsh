@@ -47,15 +47,18 @@ gs() {
 	#  2. project/src/_gs
 	#  3. project/_gs
 	#  4. _gs (repo root)
-	for (( index="${length}"; index>=0; index-- )); do
+	for (( index=length; index>=0; index-- )); do
 		gs_path="${tld}$(printf "/%s" "${dirs[@]:0:$index}")/_gs"
 		gs_path="${gs_path:gs,//,/}" # Normalize path
 
 		if [[ -e "${gs_path}" ]]; then
-			# Execute command if it exists
 			if [[ -n "${command}" && -e "${gs_path}/${command}" ]]; then
 				shift
-				"${gs_path}/${command}" "$@"
+				if [[ "${command}" =~ \.mod$ ]]; then
+					source "${gs_path}/${command}" "$@"
+				else
+					"${gs_path}/${command}" "$@"
+				fi
 				return
 			fi
 
@@ -70,18 +73,15 @@ gs() {
 			# Store path for ordering
 			dir_order+=("${display_path}")
 
-			# Find executable symlinks with OS-specific syntax
+			# Find executable symlinks and .mod files (perm syntax: BSD +111=any exec bit, GNU -111=all exec bits)
 			local find_cmd=""
 			if [[ ${is_mac} -eq 1 ]]; then
-				# macOS/BSD find syntax
-				find_cmd="find \"${gs_path}/\" -type l -perm +111 -exec basename {} \;"
+				find_cmd="find \"${gs_path}/\" -type l \( -perm +111 -o -name '*.mod' \) -exec basename {} \;"
 			else
-				# GNU/Linux find syntax
-				find_cmd="find \"${gs_path}/\" -type l ! -xtype l -perm -111 -exec basename {} \;"
+				find_cmd="find \"${gs_path}/\" -type l \( ! -xtype l -perm -111 -o -name '*.mod' \) -exec basename {} \;"
 			fi
 
-			# Find executable symlinks and filter out already-seen commands
-			# This mimics PATH resolution where first match wins
+			# Filter out already-seen commands (mimics PATH resolution where first match wins)
 			local cmd_list=""
 			while IFS= read -r cmd; do
 				[[ -z "${cmd}" ]] && continue
@@ -103,7 +103,7 @@ gs() {
 
 					cmd_list+="${cmd}"$'\n'
 				fi
-			done < <(eval "${find_cmd}" | sort)
+			done < <(eval "${find_cmd}" | sort -f)
 
 			# Remove trailing newline
 			cmd_list="${cmd_list%$'\n'}"
