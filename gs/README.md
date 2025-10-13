@@ -132,10 +132,14 @@ To source a `.mod` command that sets up your development environment:
 gs env.mod
 ```
 
-This sources the `env.mod` symlink into your current shell. The script can now set variables, change directories, or modify your environment directly.
+This sources the `env.mod` symlink into your current shell. If the script contains:
 
-> [!TIP]
-> Running `gs env` (without `.mod`) would execute in a subprocess. You'd see output but environment changes wouldn't affect your shell.
+```bash
+export PROJECT_ROOT=$(git rev-parse --show-toplevel)
+export PATH="$PROJECT_ROOT/bin:$PATH"
+```
+
+These variables are now set in your current shell. Running `gs env` (without `.mod`) would execute in a subprocess and you'd see output but environment changes wouldn't affect your shell.
 
 </details>
 
@@ -164,18 +168,6 @@ This sources the `env.mod` symlink into your current shell. The script can now s
 
 ---
 
-## Command Resolution
-
-The `gs` function follows a "shadowing" approach similar to how `PATH` resolution works:
-
-1. The function searches `_gs` directories from the current directory up to the repository root.
-2. The first occurrence of a command with a given name takes precedence.
-3. Commands in closer directories override those with the same name in more distant directories.
-
-This allows you to create local overrides of global commands when needed.
-
----
-
 ## Troubleshooting
 
 1. **No `_gs` Commands Found**:
@@ -189,9 +181,3 @@ This allows you to create local overrides of global commands when needed.
 3. **Missing Descriptions**:
    - Ensure your `.gs.json` files are valid JSON with a `description` field.
    - Check that you have `jq` installed for JSON parsing.
-
----
-
-## Conclusion
-
-The `gs` function simplifies repository-specific task management by leveraging `_gs` directories and symbolic links. By following the guidelines above, you can create a flexible and efficient workflow tailored to your project's structure.
