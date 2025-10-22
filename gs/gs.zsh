@@ -16,7 +16,7 @@ gs() {
 	prefix="$(git rev-parse --show-prefix)"
 	prefix=${prefix%/}
 	IFS='/'
-	dirs=("${(s:/:)prefix}")
+	dirs=(${(s:/:)prefix})
 	unset IFS
 
 	local gs_path index
