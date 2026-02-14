@@ -33,7 +33,7 @@ run_test() {
     local test_name="$1"
     local test_dir="$2"
     local command="$3"
-    local snapshot_file="${TEST_DIR}/${test_name}.bash.snapshot"
+    local snapshot_file="${TEST_DIR}/${test_name}.snapshot"
 
     TOTAL_TESTS=$((TOTAL_TESTS + 1))
     echo -n "Testing: ${test_name}... "

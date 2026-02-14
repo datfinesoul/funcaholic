@@ -1,0 +1,3 @@
+# Command descriptions
+env = "Display repo environment variables for JS"
+lint = "JS Lint"

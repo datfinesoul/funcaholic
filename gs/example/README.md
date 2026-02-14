@@ -9,7 +9,7 @@ example/
 ├── _gs/                          # Root commands (lowest priority)
 │   ├── env -> ../_scripts/show-env.bash
 │   ├── env.mod -> ../_scripts/env.source.bash
-│   └── *.gs.json files
+│   └── descriptions.toml
 ├── js/
 │   ├── _gs/                      # JS-specific commands (override root)
 │   │   ├── env -> show-env.bash          # Local override

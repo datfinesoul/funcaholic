@@ -64,24 +64,24 @@ gs [command] [arguments]
 
 ### Command Descriptions
 
-You can add descriptions to commands by creating a JSON file with the same name as the command plus `.gs.json` extension. For example:
+You can add descriptions to commands by creating a `descriptions.toml` file inside a `_gs` directory. For example:
 
 ```
 _gs/
 ├── build -> ../scripts/build.sh
-├── build.gs.json
+├── descriptions.toml
 └── env.mod -> ../scripts/dev-env.sh
 ```
 
-Where `build.gs.json` contains:
+Where `descriptions.toml` contains:
 
-```json
-{
-  "description": "Build the project for production"
-}
+```toml
+# Command descriptions
+build = "Build the project for production"
+env.mod = "Source repo environment variables into current shell"
 ```
 
-This description will appear in the command listing output.
+These descriptions will appear in the command listing output.
 
 ### Examples
 
@@ -95,8 +95,8 @@ repo/
 ├── src/
 │   ├── utils/
 │   │   ├── _gs/
+│   │   │   ├── descriptions.toml
 │   │   │   ├── lint -> ../../scripts/lint.sh
-│   │   │   ├── lint.gs.json
 │   │   │   └── test -> ../../scripts/test.sh
 │   └── _gs/
 │       └── build -> ../../scripts/build.sh
@@ -170,7 +170,7 @@ These variables are now set in your current shell. Running `gs env` (without `.m
    - Use descriptive names for symbolic links to indicate their purpose clearly.
 
 2. **Add Descriptions**:
-   - Create `.gs.json` files for your commands to provide helpful descriptions.
+   - Create a `descriptions.toml` file in your `_gs` directory to provide helpful descriptions.
    - Keep descriptions concise but informative.
 
 3. **Symbolic Links Only**:
@@ -240,5 +240,5 @@ The combination of **directory-hierarchy traversal with shadowing**, **symlink-b
    - Check for permissions or path issues with the target of the symbolic link.
 
 3. **Missing Descriptions**:
-   - Ensure your `.gs.json` files are valid JSON with a `description` field.
-   - Check that you have `jq` installed for JSON parsing.
+   - Ensure your `descriptions.toml` file uses valid `key = "value"` syntax.
+   - Check that keys match command names exactly (e.g., `env.mod` for a `.mod` command).

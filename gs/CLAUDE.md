@@ -29,7 +29,7 @@ The `gs` function implements a "shadowing" system similar to PATH resolution:
 2. **Command Resolution**: First occurrence of a command name takes precedence (closer directories override distant ones)
 3. **Execution**: Executes symbolic links as commands OR sources them if they end in `.mod`
 4. **Listing**: When no command specified, lists all available commands grouped by directory
-5. **Descriptions**: Supports `.gs.json` files alongside commands to provide descriptions
+5. **Descriptions**: Supports `descriptions.toml` files in `_gs` directories to provide command descriptions
 
 ## Command Execution Types
 
@@ -41,7 +41,7 @@ The `gs` function implements a "shadowing" system similar to PATH resolution:
 
 - **Git Integration**: Must be run within a git repository; uses `git rev-parse` for path resolution
 - **Cross-Platform**: Handles macOS/BSD vs GNU/Linux differences in `find` command syntax
-- **JSON Support**: Optional `jq` integration for command descriptions
+- **TOML Descriptions**: Pure shell parsing of `descriptions.toml` for command descriptions (no external deps)
 - **Shell Completion**: Dynamic completion based on available commands in `_gs` directories
 - **File Discovery**: Finds both executable symlinks (permission-based) and `.mod` files (name-based)
 
