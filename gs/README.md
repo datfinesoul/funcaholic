@@ -186,6 +186,49 @@ These variables are now set in your current shell. Running `gs env` (without `.m
 
 ---
 
+## Comparison with Alternatives
+
+There are several well-established project task runners. Here's how `gs` compares:
+
+| Feature | gs | just | Task | mise | direnv | Make |
+|---|:---:|:---:|:---:|:---:|:---:|:---:|
+| Dir hierarchy traversal + shadowing | :white_check_mark: | :x: | :x: | :x: | :heavy_minus_sign: | :x: |
+| Shell env sourcing | :white_check_mark: | :x: | :x: | :heavy_minus_sign: | :heavy_minus_sign: | :x: |
+| Symlink-based (decoupled from config) | :white_check_mark: | :x: | :x: | :x: | :x: | :x: |
+| Git-scoped | :white_check_mark: | :x: | :x: | :white_check_mark: | :x: | :x: |
+| Shell completion | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | — | :heavy_minus_sign: |
+| Config format | `_gs/` symlinks | justfile | Taskfile.yml | mise.toml | .envrc | Makefile |
+
+### [just](https://github.com/casey/just) (~31k stars)
+
+A Rust-based command runner using a `justfile`. The most popular dedicated command runner with a rich feature set (parameters, conditionals, multi-language recipes, shell completion). However, it uses a single flat file with no directory traversal or shadowing, and cannot source commands into the current shell.
+
+### [Task](https://github.com/go-task/task) (~15k stars)
+
+A Go-based runner using `Taskfile.yml`. Has dependency graphs, file-change detection, and parallel execution. Same single-file limitation as just — no hierarchy traversal and no shell sourcing.
+
+### [mise](https://github.com/jdx/mise) (~25k stars)
+
+A polyglot dev environment tool that combines version management, environment variables, and task running. Supports file-based tasks in a `mise/tasks/` directory and can modify the shell environment, but only for tool versions and env vars — not arbitrary sourcing. No directory shadowing.
+
+### [direnv](https://github.com/direnv/direnv) (~15k stars)
+
+Loads and unloads environment variables per-directory via `.envrc` files. The closest match to `gs`'s `.mod` feature — it traverses the directory hierarchy and modifies the current shell. But it's exclusively for environment variables, not command running or discovery.
+
+### [GNU Make](https://www.gnu.org/software/make/)
+
+Ubiquitous but fundamentally a build system with dependency tracking, not a command runner. No directory traversal, no shell sourcing, and its own idiosyncratic syntax (tab-sensitivity, `.PHONY` declarations).
+
+### [Scripts to Rule Them All](https://github.com/github/scripts-to-rule-them-all) (~9k stars)
+
+A convention from GitHub: standardized scripts in a `script/` directory (`script/bootstrap`, `script/test`, etc.). Not a tool — no automatic discovery, listing, completion, or shadowing.
+
+### What makes `gs` different
+
+The combination of **directory-hierarchy traversal with shadowing**, **symlink-based command organization** (decoupling the registry from the implementation), and **`.mod` sourcing** for shell environment modification is unique to `gs`. The closest equivalent would be combining direnv with just, but that still wouldn't provide the symlink-based shadowing system.
+
+---
+
 ## Troubleshooting
 
 1. **No `_gs` Commands Found**:
